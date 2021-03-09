@@ -1,7 +1,7 @@
 import pygame
 import os
 import Objects
-import ScreenEngine
+import ScreenEngine as SE
 import Logic
 import Service
 
@@ -17,6 +17,7 @@ if not KEYBOARD_CONTROL:
     import numpy as np
     answer = np.zeros(4, dtype=float)
 
+#Hero base stats
 base_stats = {
     "strength": 20,
     "endurance": 20,
@@ -28,13 +29,14 @@ base_stats = {
 def create_game(sprite_size, is_new):
     global hero, engine, drawer, iteration
     if is_new:
+        #create hero
         hero = Objects.Hero(base_stats, Service.create_sprite(
             os.path.join("texture", "Hero.png"), sprite_size))
+        #Create game engine
         engine = Logic.GameEngine()
         Service.service_init(sprite_size)
         Service.reload_game(engine, hero)
-        with ScreenEngine as SE:
-            drawer = SE.GameSurface((640, 480), pygame.SRCALPHA, (0, 480),
+        drawer = SE.GameSurface((640, 480), pygame.SRCALPHA, (0, 480),
                                     SE.ProgressBar((640, 120), (640, 0),
                                                    SE.InfoWindow((160, 600), (50, 50),
                                                                  SE.HelpWindow((700, 500), pygame.SRCALPHA, (0, 0),
@@ -49,13 +51,12 @@ def create_game(sprite_size, is_new):
         Service.service_init(sprite_size, False)
 
     Logic.GameEngine.sprite_size = sprite_size
-
     drawer.connect_engine(engine)
-
     iteration = 0
 
-
+#zoom size
 size = 60
+#Game creation
 create_game(size, True)
 
 while engine.working:

@@ -13,7 +13,7 @@ def create_sprite(img, sprite_size):
 
 class AbstractObject(ABC):
     def __init__(self):
-        pass #TODO
+        pass
 
     @abstractmethod
     def draw(self, display):
@@ -39,6 +39,9 @@ class Creature(AbstractObject):
     def calc_max_HP(self):
         self.max_hp = 5 + self.stats["endurance"] * 2
 
+    def draw(self, display):
+        display.draw_object(self.sprite, self.position)
+
 class Hero(Creature):
 
     def __init__(self, stats, icon):
@@ -49,25 +52,25 @@ class Hero(Creature):
         super().__init__(icon, stats, pos)
 
     def level_up(self):
-        while self.exp >= 100 * (2 ** (self.level - 1)):
-            yield "level up!"
-            self.level += 1
-            self.stats["strength"] += 2
-            self.stats["endurance"] += 2
-            self.calc_max_HP()
-            self.hp = self.max_hp
+        self.level += 1
+        self.stats["strength"] += 2
+        self.stats["endurance"] += 2
+        self.calc_max_HP()
+        self.hp = self.max_hp
 
 
-def Enemy(Creature, Interactive):
+class Enemy(Creature, Interactive):
 
-    def __init__(self, icon, stats, xp, position):
-        self.icon = icon
+    def __init__(self, icon, action, stats, xp, position):
+        self.sprite = icon
+        self.action = action
         self.stats = stats
         self.xp = xp
         self.position = position
 
     def interact(self, engine, hero):
-        pass #TODO
+        enemy = self
+        self.action(engine, hero, enemy)
 
 class Ally(AbstractObject, Interactive):
 
@@ -78,6 +81,9 @@ class Ally(AbstractObject, Interactive):
 
     def interact(self, engine, hero):
         self.action(engine, hero)
+
+    def draw(self, display):
+        display.draw_object(self.sprite, self.position)
 
 
 class Effect(Hero):
@@ -145,12 +151,26 @@ class Effect(Hero):
 
 class Berserk(Effect):
     def apply_effect(self):
-        pass #TODO
+        self.hp = self.base.hp + 10
+        self.stats["strength"] += 7
+        self.stats["endurance"] += 7
+        self.stats["intelligence"] -= 3
+        self.stats["luck"] += 7
+
 
 class Blessing(Effect):
     def apply_effect(self):
-        pass # TODO
+        self.hp = self.base.hp + 10
+        self.stats["strength"] += 2
+        self.stats["endurance"] -= 1
+        self.stats["intelligence"] += 5
+        self.stats["luck"] += 2
+
 
 class Weakness(Effect):
     def apply_effect(self):
-        pass # TODO
+        self.hp = self.base.hp - 20
+        self.stats["strength"] -= 10
+        self.stats["endurance"] -= 10
+        self.stats["intelligence"] -= 5
+        self.stats["luck"] -= 5
