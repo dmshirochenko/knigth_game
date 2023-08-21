@@ -1,3 +1,2 @@
-pygame
-random
-PyYAML
+pygame==2.0.0.dev12
+PyYAML==3.13

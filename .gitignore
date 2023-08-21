@@ -4,3 +4,4 @@ test.py
 *.pot
 *.pyc
 *.key
+.venv/
